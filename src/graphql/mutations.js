@@ -236,6 +236,7 @@ export const addCreateCollectiveMutation = graphql(createCollectiveQuery, {
         'quantity',
         'HostCollectiveId',
         'ParentCollectiveId',
+        'isAnonymous',
         'data',
         CollectiveInputType,
       ]);
