@@ -62,6 +62,7 @@ Avatar.propTypes = {
   radius: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   /** Duration to transition size. Disabled if 0, null or undefined */
   animationDuration: PropTypes.number,
+  isAnonymous: PropTypes.bool,
 };
 
 export default Avatar;
