@@ -139,19 +139,29 @@ const StyledCollectiveCard = ({ collective, children, ...props }) => {
     <StyledCard className="collective-card" {...props}>
       <CollectiveLogoContainer mt={47}>
         <Box mt={-32}>
-          <Link route="collective" params={{ slug: collective.slug }}>
-            <a>
-              <Avatar collective={collective} radius={48} />
-            </a>
-          </Link>
+          {collective.isAnonymous ? (
+            <Avatar collective={collective} radius={48} />
+          ) : (
+            <Link route="collective" params={{ slug: collective.slug }}>
+              <a>
+                <Avatar collective={collective} radius={48} />
+              </a>
+            </Link>
+          )}
         </Box>
       </CollectiveLogoContainer>
-      <Container display="flex" mt={2} cursor="pointer" justifyContent="center">
-        <Link route="collective" passHref params={{ slug: collective.slug }}>
-          <StyledLink fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
+      <Container display="flex" mt={2} justifyContent="center">
+        {collective.isAnonymous ? (
+          <P fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
             {collective.name}
-          </StyledLink>
-        </Link>
+          </P>
+        ) : (
+          <Link route="collective" passHref params={{ slug: collective.slug }}>
+            <StyledLink fontSize="Paragraph" fontWeight="bold" lineHeight="Caption" color="black.900">
+              {collective.name}
+            </StyledLink>
+          </Link>
+        )}
       </Container>
       {children}
     </StyledCard>
@@ -168,10 +178,11 @@ StyledCollectiveCard.propTypes = {
     type: PropTypes.string,
     website: PropTypes.string,
     name: PropTypes.string,
+    isAnonymous: PropTypes.bool,
   }).isRequired,
 };
 
-StyledCollectiveCard.defaultProps = { width: 160, mx: 'auto' };
+StyledCollectiveCard.defaultProps = { width: 160, mx: 'auto', isAnonymous: false };
 
 class OrderSuccessPage extends React.Component {
   static propTypes = {
@@ -452,16 +463,18 @@ class OrderSuccessPage extends React.Component {
             )}
           </Container>
 
-          <Flex flexWrap="wrap" justifyContent="center" mt={2}>
-            <ShareLink href={tweetURL({ url: referralURL, text: message })}>
-              <Twitter size="1.2em" color="#38A1F3" />
-              <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
-            </ShareLink>
-            <ShareLink href={facebooKShareURL({ u: referralURL })}>
-              <Facebook size="1.2em" color="#3c5a99" />
-              <FormattedMessage id="shareIt" defaultMessage="Share it" />
-            </ShareLink>
-          </Flex>
+          {!fromCollective.isAnonymous && (
+            <Flex flexWrap="wrap" justifyContent="center" mt={2}>
+              <ShareLink href={tweetURL({ url: referralURL, text: message })}>
+                <Twitter size="1.2em" color="#38A1F3" />
+                <FormattedMessage id="tweetIt" defaultMessage="Tweet it" />
+              </ShareLink>
+              <ShareLink href={facebooKShareURL({ u: referralURL })}>
+                <Facebook size="1.2em" color="#3c5a99" />
+                <FormattedMessage id="shareIt" defaultMessage="Share it" />
+              </ShareLink>
+            </Flex>
+          )}
           <Box width={64} my={4} bg="black.300" css={{ height: '1px' }} />
           {collective.tags && (
             <Flex flexDirection="column" alignItems="center" mb={4}>
@@ -482,8 +495,8 @@ class OrderSuccessPage extends React.Component {
               </Flex>
             </Flex>
           )}
-          {!LoggedInUser && this.renderUserProfileBtn(true)}
-          {LoggedInUser && !loggedInUserLoading && (
+          {!fromCollective.isAnonymous && !LoggedInUser && this.renderUserProfileBtn(true)}
+          {!fromCollective.isAnonymous && LoggedInUser && !loggedInUserLoading && (
             <Link route="collective" params={{ slug: fromCollective.slug }} passHref>
               {this.renderUserProfileBtn()}
             </Link>
@@ -510,6 +523,7 @@ const getOrder = graphql(gql`
         name
         path
         slug
+        isAnonymous
       }
       collective {
         name
