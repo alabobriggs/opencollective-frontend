@@ -1760,14 +1760,6 @@ enum OrderDirection {
   DESC
 }
 
-input CustomFieldsInputType {
-  type: String
-  label: String
-  name: String
-  required: Boolean
-  value: String
-}
-
 """
 Input type for OrderType
 """
@@ -1783,7 +1775,7 @@ input OrderInputType {
   publicMessage: String
   privateMessage: String
   paymentMethod: PaymentMethodInputType
-  customFields: [CustomFieldsInputType]
+  customData: JSON
 
   """
   The first part of the UUID of the PaymentMethod that can be used to match the donation
@@ -2540,6 +2532,16 @@ type Subscription {
 }
 
 """
+CustomFields Type
+"""
+type CustomFieldsType {
+  type: String
+  label: String
+  name: String
+  required: Boolean
+}
+
+"""
 This represents an Tier
 """
 type Tier {
@@ -2614,6 +2616,13 @@ type Tier {
   stats: TierStatsType
 }
 
+input CustomFieldsInputType {
+  type: String
+  label: String
+  name: String
+  required: Boolean
+}
+
 """
 Input type for TierType
 """
@@ -2650,6 +2659,11 @@ input TierInputType {
   """
   goal: Int
   password: String
+  customFields: [CustomFieldsInputType]
+
+  """
+  amount that you are trying to raise with this tier
+  """
   customFields: [CustomFieldsInputType]
 
   """
